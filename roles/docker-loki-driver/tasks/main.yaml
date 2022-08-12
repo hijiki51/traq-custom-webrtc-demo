@@ -1,0 +1,10 @@
+- name: Check loki logging driver installation
+  command: docker plugin inspect loki
+  register: loki_check_result
+  check_mode: no
+  ignore_errors: true
+  changed_when: no
+
+- name: Install loki logging driver
+  command: docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all-permissions
+  when: loki_check_result.rc != 0

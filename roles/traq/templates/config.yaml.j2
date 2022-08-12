@@ -1,0 +1,24 @@
+origin: https://q.example.com
+port: 3000
+allowSignUp: true
+
+mariadb:
+  host: db
+  port: 3306
+  username: {{db.traq.username}}
+  password: {{db.traq.password}}
+  database: {{db.traq.database}}
+
+es:
+  url: http://es:9200
+
+storage:
+  type: local
+  local:
+    dir: /app/storage
+# Skyway settings.
+# You must set this to enable the call ('Qall') feature.
+skyway:
+  apiKey: {{traq.webrtc.api_key}}
+  # Skyway secret key.
+  secretKey: {{traq.webrtc.api_secret}}

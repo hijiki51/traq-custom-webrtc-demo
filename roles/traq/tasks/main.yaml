@@ -1,0 +1,13 @@
+- name: Create traq docker network
+  docker_network:
+    name: traq
+    appends: yes
+
+- name: Copy caddy traq configuration
+  template:
+    src: caddy/traq.j2
+    dest: /opt/caddy/vhosts/traq
+  notify: reload caddy
+
+- import_tasks: traq.yaml
+  become: true

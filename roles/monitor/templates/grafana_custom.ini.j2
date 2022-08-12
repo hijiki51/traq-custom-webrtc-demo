@@ -1,0 +1,23 @@
+[server]
+http_port = 3000
+domain = {{ grafana.host }}
+root_url = https://{{ grafana.host }}
+enable_gzip = true
+
+[auth]
+oauth_auto_login = true
+
+[auth.anonymous]
+[auth.github]
+enabled = true
+client_id = {{ grafana.client_id }}
+client_secret = {{ grafana.client_secret }}
+scopes = user:email,read:org
+auth_url = https://github.com/login/oauth/authorize
+token_url = https://github.com/login/oauth/access_token
+api_url = https://api.github.com/user
+
+[external_image_storage]
+provider = local
+
+[external_image_storage.local]

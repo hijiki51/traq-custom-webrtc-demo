@@ -1,0 +1,7 @@
+[main]
+main.example.com
+[monitor]
+monitor.example.com
+[rtc]
+webrtc.example.com
+

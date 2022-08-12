@@ -1,0 +1,24 @@
+- import_tasks: apt.yaml
+  become: true
+
+- import_tasks: time.yaml
+  become: true
+
+- name: set hostname
+  become: true
+  hostname:
+    name: "{{ hostname }}"
+
+- name: Add wheel group
+  group:
+    name: wheel
+    state: present
+
+- name: Add sudo permission to wheel users
+  become: true
+  lineinfile:
+    path: /etc/sudoers
+    state: present
+    regexp: "^%wheel ALL="
+    line: "%wheel ALL=(ALL) NOPASSWD: ALL"
+    validate: "visudo -cf %s"

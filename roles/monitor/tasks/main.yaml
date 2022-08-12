@@ -1,0 +1,53 @@
+- name: Create service directory
+  file:
+    path: "/opt/{{ item }}"
+    state: directory
+    mode: '0755'
+  with_items:
+    - monitor
+    - grafana
+    - grafana/data
+    - prometheus
+    - prometheus/data
+    - blackbox_exporter
+    - trickster
+
+- name: Copy blackbox_exporter configuration
+  template:
+    src: blackbox.yaml.j2
+    dest: /opt/blackbox_exporter/blackbox.yaml
+  notify: restart monitor
+
+- name: Copy prometheus configuration
+  template:
+    src: prometheus.yaml.j2
+    dest: /opt/prometheus/prometheus.yaml
+  notify: restart monitor
+
+- name: Copy trickster configuration
+  copy:
+    src: trickster.conf
+    dest: /opt/trickster/trickster.conf
+  notify: restart monitor
+
+- name: Copy grafana configuration
+  template:
+    src: grafana_custom.ini.j2
+    dest: /opt/grafana/grafana.ini
+  notify: restart monitor
+
+- name: Copy monitor docker-compose.yaml
+  copy:
+    src: docker-compose.yaml
+    dest: /opt/monitor/docker-compose.yaml
+
+- name: Copy caddy configuration
+  template:
+    src: caddy/grafana.j2
+    dest: /opt/caddy/vhosts/grafana
+  notify: reload caddy
+
+- name: Run monitor docker-compose up
+  docker_compose:
+    project_src: /opt/monitor
+    state: present

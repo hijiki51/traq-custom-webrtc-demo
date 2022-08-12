@@ -1,0 +1,78 @@
+- name: Create directory
+  become: true
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+  loop:
+    - /opt/livekit/caddy_data
+    - /usr/local/bin
+
+- name: Open ports
+  ufw:
+    rule: allow
+    direction: in
+    state: enabled
+    proto: "{{ item.protocol }}"
+    to_port: "{{ item.port }}"
+  loop:
+    - { 
+        protocol: udp,
+        port: "443"
+      }
+    - { 
+        protocol: udp,
+        port: "50000:60000"
+      }
+
+- name: Copy templates
+  become: true
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  loop:
+    - {
+        src: livekit.yaml.j2,
+        dest: /opt/livekit/livekit.yaml,
+        mode: 0644
+      }
+    - { 
+        src: caddy.yaml.j2,
+        dest: /opt/livekit/caddy.yaml,
+        mode: 0644
+      }
+
+- name: Copy files
+  become: true
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  loop:
+    - {
+        src: update_ip.sh,
+        dest: /opt/livekit/update_ip.sh,
+        mode: 0755
+      }
+    - { 
+        src: docker-compose.yaml,
+        dest: /opt/livekit/docker-compose.yaml,
+        mode: 0644
+      }
+    - {
+        src: redis.conf,
+        dest: /opt/livekit/redis.conf,
+        mode: 0644
+      }
+
+- name: Run update_ip.sh
+  become: true
+  shell: /opt/livekit/update_ip.sh
+
+- name: Docker compose up
+  become: true
+  docker_compose:
+    project_src: /opt/livekit
+    state: present
+    restarted: true

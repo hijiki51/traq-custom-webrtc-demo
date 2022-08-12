@@ -1,0 +1,80 @@
+global:
+  scrape_interval: 10s
+  evaluation_interval: 10s
+
+scrape_configs:
+
+  - job_name: prometheus
+    static_configs:
+      - targets:
+        - localhost:9090
+  - job_name: nodes
+    static_configs:
+      - targets:
+        - main.example.com:9100
+        - monitor.example.com:9100
+        - webrtc.example.com:9100
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        regex: ^(private\.|)([^:]+):.+
+        replacement: ${2}
+
+  - job_name: blackbox
+    metrics_path: /probe
+    params:
+      module:
+        - http_check
+    static_configs:
+      - targets:
+        - https://q.example.com
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+        regex: https?://(.+)
+        replacement: ${1}
+      - target_label: __address__
+        replacement: blackbox_exporter:9115 # blackbox_exporter
+
+  - job_name: ssl
+    scrape_interval: 300s
+    metrics_path: /probe
+    static_configs:
+      - targets:
+        - q.example.com:443
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+        regex: (.+):443
+        replacement: ${1}
+      - target_label: __address__
+        replacement: ssl_exporter:9219 # ssl_exporter
+
+  - job_name: domain
+    scrape_interval: 300s
+    metrics_path: /probe
+    static_configs:
+      - targets:
+        - example.com
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: domain_exporter:9222 # domain_exporter
+
+  - job_name: cadvisor
+    static_configs:
+      - targets:
+        - main.example.com:9500
+        - monitor.example.com:9500
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        regex: ^(private\.|)([^:]+):.+
+        replacement: ${2}

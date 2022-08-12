@@ -1,0 +1,74 @@
+version: '3'
+
+services:
+  backend:
+    image: ghcr.io/hijiki51/traq:latest
+    container_name: traq-backend
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+      es:
+        condition: service_healthy
+    volumes:
+      - app-storage:/app/storage
+      - /srv/traq/config.yaml:/app/config.yaml:ro
+    ports:
+      - "{{traq.port}}:3000"
+
+  traq-frontend:
+    image: ghcr.io/hijiki51/traq-ui:latest
+    container_name: traq-frontend
+    restart: always
+    ports:
+      - "127.0.0.1:{{traq.frontend_port}}:80"
+    volumes:
+      - ./override/:/app/override
+  
+  traq-widget:
+    image: ghcr.io/traptitech/traq-widget:latest
+    container_name: traq-widget
+    restart: always
+    ports:
+      - "{{traq.widget_port}}:80"
+  db:
+    image: mariadb:10.6.4
+    restart: always
+    environment:
+      MYSQL_USER: {{db.traq.username}}
+      MYSQL_PASSWORD: {{db.traq.password}}
+      MYSQL_ROOT_PASSWORD: {{db.traq.root_password}}
+      MYSQL_DATABASE: {{db.traq.database}}
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci
+    expose:
+      - "3306"
+    volumes:
+      - mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 60s
+      interval: 1s
+      retries: 100
+
+  es:
+    container_name: traq-es
+    image: ghcr.io/traptitech/es-with-sudachi:7.10.2-2.1.1-SNAPSHOT
+    restart: always
+    ports:
+      - "127.0.0.1:9200:9200"
+    environment:
+      - discovery.type=single-node
+    volumes:
+      - es:/usr/share/elasticsearch/data
+      - /srv/traq/es_jvm.options:/usr/share/elasticsearch/config/jvm.options.d/es_jvm.options:ro
+    mem_limit: 512m
+    healthcheck:
+      test: ["CMD-SHELL", "curl --silent --fail localhost:9200/_cluster/health || exit 1"]
+      timeout: 60s
+      interval: 1s
+      retries: 100
+
+volumes:
+  mysql:
+  es:
+  app-storage:

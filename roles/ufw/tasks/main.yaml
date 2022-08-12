@@ -1,0 +1,17 @@
+- name: Reset ufw settings
+  ufw:
+    state: reset
+
+- name: Enable ufw
+  systemd:
+    name: ufw
+    enabled: yes
+    daemon_reload: yes
+
+- name: Configure public accepted ports
+  ufw:
+    rule: allow
+    direction: in
+    state: enabled
+    to_port: "{{ item }}"
+  with_items: "{{ public_allowed_ports }}"

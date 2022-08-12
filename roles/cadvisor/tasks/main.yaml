@@ -1,0 +1,19 @@
+- name: Run cadvisor
+  docker_container:
+    name: cadvisor
+    image: gcr.io/cadvisor/cadvisor:{{ cadvisor_version }}
+    restart_policy: unless-stopped
+    log_driver: none
+    ports:
+      - "9500:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    detach: true
+    privileged: true
+    devices:
+      - /dev/kmsg
+    pull: true

@@ -1,0 +1,10 @@
+(tls-config) {
+    tls {
+        dns cloudflare {{cloudflare_api_key}}
+        resolvers 1.1.1.1
+    }
+}
+:9833 {
+    metrics
+}
+import /opt/caddy/vhosts/*

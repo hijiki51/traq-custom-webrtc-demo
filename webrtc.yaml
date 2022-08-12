@@ -1,0 +1,9 @@
+- hosts: rtc
+  become: yes
+  roles:
+    - common
+    - ufw
+    - docker
+    - node_exporter
+    - cadvisor
+    - livekit

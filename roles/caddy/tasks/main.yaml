@@ -1,0 +1,88 @@
+- name: Create tmp caddy directory
+  become: false
+  file:
+    path: "/tmp/caddy-custom_{{ caddy_custom_version }}_linux_amd64"
+    state: directory
+    mode: 0755
+  delegate_to: localhost
+
+- name: Download & unpack caddy binary
+  become: false
+  unarchive:
+    remote_src: true
+    src: "https://github.com/hijiki51/caddy/releases/download/v{{ caddy_custom_version }}/caddy-custom_linux_amd64.tar.gz"
+    dest: "/tmp/caddy-custom_{{ caddy_custom_version }}_linux_amd64"
+    creates: "/tmp/caddy-custom_{{ caddy_custom_version }}_linux_amd64/caddy-custom_linux_amd64/caddy"
+  register: _download_binary
+  until: _download_binary is succeeded
+  retries: 5
+  delay: 2
+  delegate_to: localhost
+  check_mode: false
+
+- name: Propagate caddy binaries
+  copy:
+    src: "/tmp/caddy-custom_{{ caddy_custom_version }}_linux_amd64/caddy-custom_linux_amd64/caddy"
+    dest: "/usr/bin/caddy"
+    mode: 0755
+  notify: restart caddy
+  check_mode: false
+
+- name: Ensure group "caddy" exists
+  group:
+    name: caddy
+    state: present
+    system: yes
+
+- name: Ensure user "caddy" exists
+  user:
+    name: caddy
+    group: caddy
+    comment: Caddy web server
+    shell: /usr/sbin/nologin
+    home: /var/lib/caddy
+    create_home: yes
+    state: present
+    system: yes
+
+- name: Create /opt/caddy/vhosts
+  file:
+    path: /opt/caddy/vhosts
+    state: directory
+    mode: 0755
+
+- name: Create /opt/caddy/vhosts
+  file:
+    path: /opt/caddy/vhosts
+    state: directory
+    mode: 0755
+
+- name: Create /etc/caddy
+  file:
+    path: /etc/caddy
+    state: directory
+    mode: 0755
+
+- name: Copy Caddyfile
+  template:
+    src: Caddyfile.j2
+    dest: /etc/caddy/Caddyfile
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart caddy
+
+- name: Copy caddy systemd service file
+  copy:
+    src: caddy.service
+    dest: /etc/systemd/system/caddy.service
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart caddy
+
+- name: Ensure caddy is enabled on boot
+  systemd:
+    daemon_reload: true
+    name: caddy
+    enabled: true

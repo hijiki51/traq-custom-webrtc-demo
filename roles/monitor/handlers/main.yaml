@@ -1,0 +1,13 @@
+- name: reload caddy
+  become: true
+  systemd:
+    daemon_reload: true
+    name: caddy
+    state: reloaded
+
+- name: restart monitor
+  become: true
+  docker_compose:
+    project_src: /opt/monitor
+    state: present
+    restarted: true

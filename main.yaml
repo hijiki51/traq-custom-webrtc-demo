@@ -1,0 +1,12 @@
+
+- hosts: main
+  become: yes
+  roles:
+    - common
+    - ufw
+    - es-kernel
+    - docker
+    - node_exporter
+    - cadvisor
+    - caddy
+    - traq

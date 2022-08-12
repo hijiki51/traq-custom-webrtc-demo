@@ -1,0 +1,26 @@
+q.example.com {
+    header {
+        Strict-Transport-Security "max-age=31536000;"
+        X-Robots-Tag "none"
+    }
+    handle /api/* {
+        reverse_proxy localhost:{{traq.port}}
+    }
+    handle /.well-known/* {
+        respond 404
+    }
+    handle /.well-known/change-password {
+        redir * /settings/session
+    }
+    handle /widget {
+        uri strip_prefix /widget
+        reverse_proxy localhost:{{traq.widget_port}}
+    }
+    handle /widget/* {
+        uri strip_prefix /widget
+        reverse_proxy localhost:{{traq.widget_port}}
+    }
+    handle {
+        reverse_proxy localhost:{{traq.frontend_port}}
+    }
+}

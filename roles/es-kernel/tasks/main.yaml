@@ -1,0 +1,6 @@
+- name: Copy max_map_count kernel params conf
+  become: true
+  copy:
+    src: 50-max_map_count.conf
+    dest: /etc/sysctl.d/50-max_map_count.conf
+  notify: run sysctl

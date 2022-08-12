@@ -1,0 +1,57 @@
+- name: Create /srv/traq
+  file:
+    path: /srv/traq
+    state: directory
+    mode: 0755
+
+- name: Create /srv/traq/override
+  file:
+    path: /srv/traq/override
+    state: directory
+    mode: 0755
+
+- name: Create elasticsearch user
+  user:
+    name: elasticsearch
+    uid: 2000
+    state: present
+
+- name: Copy es_jvm.options
+  copy:
+    src: es_jvm.options
+    dest: /srv/traq/es_jvm.options
+    mode: 0644
+    owner: elasticsearch
+
+- name: Generate config.yaml
+  template:
+    src: config.yaml.j2
+    dest: /srv/traq/config.yaml
+
+- name: Generate compose.yaml
+  template:
+    src: compose.yaml.j2
+    dest: /srv/traq/docker-compose.yaml
+
+- name: Generate config.js
+  template:
+    src: config.js.j2
+    dest: /srv/traq/override/config.js
+
+- name: Copy deploy.sh
+  copy:
+    src: deploy.sh
+    dest: /srv/traq/deploy.sh
+    mode: 0755
+
+- name: Copy restart.sh
+  copy:
+    src: restart.sh
+    dest: /srv/traq/restart.sh
+    mode: 0755
+
+- name: Run docker-compose up
+  docker_compose:
+    pull: true
+    project_src: /srv/traq
+    state: present
