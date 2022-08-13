@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="e0k41Mdjl91KXGwcBldV" name="Page-1">
-        <mxGraphModel dx="2420" dy="1020" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="5000" pageHeight="5000" math="0" shadow="0">
+        <mxGraphModel dx="980" dy="413" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="5000" pageHeight="5000" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -67,7 +67,7 @@
                 <mxCell id="24" value="Caddyl4" style="rounded=1;whiteSpace=wrap;html=1;fontSize=18;" vertex="1" parent="1">
                     <mxGeometry x="970" y="735" width="160" height="70" as="geometry"/>
                 </mxCell>
-                <mxCell id="26" value="livekit" style="rounded=1;whiteSpace=wrap;html=1;fontSize=18;" vertex="1" parent="1">
+                <mxCell id="26" value="LiveKit" style="rounded=1;whiteSpace=wrap;html=1;fontSize=18;" vertex="1" parent="1">
                     <mxGeometry x="1170" y="640" width="220" height="70" as="geometry"/>
                 </mxCell>
                 <mxCell id="27" value="Redis" style="rounded=1;whiteSpace=wrap;html=1;fontSize=18;" vertex="1" parent="1">
